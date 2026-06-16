@@ -67,3 +67,9 @@ models/*.txt
 # Keep directory structure
 !data/.gitkeep
 !logs/.gitkeep
+
+
+# Allow source code package
+!src/data/
+!src/data/__init__.py
+!src/data/data_fetcher.py
