@@ -52,10 +52,12 @@ def load_model():
         # Check for model in multiple locations
         model_paths = [
             os.environ.get("MODEL_PATH"),
+            "/app/models/xauusd_best_model.joblib",
+            "./models/xauusd_best_model.joblib",
+            "../models/xauusd_best_model.joblib",
+            "./xauusd_best_model.joblib",
             "/app/models/xauusd_xgboost_model.joblib",
             "./models/xauusd_xgboost_model.joblib",
-            "../models/xauusd_xgboost_model.joblib",
-            "./xauusd_xgboost_model.joblib",
         ]
 
         model_path = None
