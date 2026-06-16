@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 import ta
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -135,23 +136,23 @@ class FeatureEngineer:
         df["rsi_7"] = ta.momentum.RSIIndicator(df["close"], window=7).rsi()
 
         # MACD
-        macd = pta.macd(df["close"], fast=12, slow=26, signal=9)
+        macd = ta.trend.MACD(df["close"], window_fast=12, window_slow=26, window_sign=9)
         if macd is not None:
             df["macd"] = macd["MACD_12_26_9"]
             df["macd_signal"] = macd["MACDs_12_26_9"]
             df["macd_hist"] = macd["MACDh_12_26_9"]
 
         # Stochastic
-        stoch = pta.stoch(df["high"], df["low"], df["close"], k=14, d=3)
+        stoch = ta.momentum.StochasticOscillator(df["high"], df["low"], df["close"], window=14, smooth_window=3)
         if stoch is not None:
             df["stoch_k"] = stoch["STOCHk_14_3_3"]
             df["stoch_d"] = stoch["STOCHd_14_3_3"]
 
         # Williams %R
-        df["williams_r"] = pta.willr(df["high"], df["low"], df["close"], length=14)
+        df["williams_r"] = ta.momentum.WilliamsRIndicator(df["high"], df["low"], df["close"], lbp=14).williams_r()
 
         # CCI
-        df["cci_20"] = pta.cci(df["high"], df["low"], df["close"], length=20)
+        df["cci_20"] = ta.trend.CCIIndicator(df["high"], df["low"], df["close"], window=20).cci()
 
         # Momentum
         df["momentum_10"] = df["close"] - df["close"].shift(10)
@@ -177,7 +178,7 @@ class FeatureEngineer:
         df["price_vs_ema50"] = (df["close"] - df["ema_50"]) / df["ema_50"]
 
         # ADX (Average Directional Index)
-        adx = pta.adx(df["high"], df["low"], df["close"], length=14)
+        adx = ta.trend.ADXIndicator(df["high"], df["low"], df["close"], window=14)
         if adx is not None:
             df["adx"] = adx["ADX_14"]
             df["adx_pos"] = adx["DMP_14"]
@@ -205,7 +206,7 @@ class FeatureEngineer:
         df["atr_ratio"] = df["atr_14"] / df["atr_14"].rolling(50).mean()
 
         # Bollinger Bands
-        bbands = pta.bbands(df["close"], length=20, std=2)
+        bbands = ta.volatility.BollingerBands(df["close"], window=20, window_dev=2)
         if bbands is not None:
             df["bollinger_upper"] = bbands["BBU_20_2.0"]
             df["bollinger_middle"] = bbands["BBM_20_2.0"]
@@ -219,7 +220,7 @@ class FeatureEngineer:
             )
 
         # Keltner Channels
-        keltner = pta.kc(df["high"], df["low"], df["close"], length=20, scalar=2)
+        keltner = ta.volatility.KeltnerChannel(df["high"], df["low"], df["close"], window=20, window_atr=10)
         if keltner is not None:
             df["keltner_upper"] = keltner["KCUe_20_2"]
             df["keltner_lower"] = keltner["KCLe_20_2"]
@@ -241,7 +242,7 @@ class FeatureEngineer:
         df["obv"] = ta.volume.OnBalanceVolumeIndicator(df["close"], df["volume"]).on_balance_volume()
 
         # CMF (Chaikin Money Flow)
-        df["cmf_20"] = pta.cmf(df["high"], df["low"], df["close"], df["volume"], length=20)
+        df["cmf_20"] = ta.volume.ChaikinMoneyFlowIndicator(df["high"], df["low"], df["close"], df["volume"], window=20).chaikin_money_flow()
 
         return df
 
