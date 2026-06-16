@@ -1,0 +1,10 @@
+{
+  "id": "chamberbot/xauusd-ai-scalping-bot",
+  "title": "XAUUSD AI Scalping Bot",
+  "code_file": "kaggle_training.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true
+}

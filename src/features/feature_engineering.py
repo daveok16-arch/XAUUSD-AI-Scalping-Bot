@@ -10,7 +10,7 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-import pandas_ta as pta
+import ta
 
 logger = logging.getLogger(__name__)
 
@@ -131,8 +131,8 @@ class FeatureEngineer:
         logger.debug("Adding momentum features...")
 
         # RSI
-        df["rsi_14"] = pta.rsi(df["close"], length=14)
-        df["rsi_7"] = pta.rsi(df["close"], length=7)
+        df["rsi_14"] = ta.momentum.RSIIndicator(df["close"], window=14).rsi()
+        df["rsi_7"] = ta.momentum.RSIIndicator(df["close"], window=7).rsi()
 
         # MACD
         macd = pta.macd(df["close"], fast=12, slow=26, signal=9)
@@ -196,10 +196,10 @@ class FeatureEngineer:
         logger.debug("Adding volatility features...")
 
         # ATR (Average True Range)
-        atr = pta.atr(df["high"], df["low"], df["close"], length=14)
+        atr = ta.volatility.AverageTrueRange(df["high"], df["low"], df["close"], window=14).average_true_range()
         if atr is not None:
             df["atr_14"] = atr
-        df["atr_7"] = pta.atr(df["high"], df["low"], df["close"], length=7)
+        df["atr_7"] = ta.volatility.AverageTrueRange(df["high"], df["low"], df["close"], window=7).average_true_range()
 
         # ATR ratio (current ATR vs rolling mean)
         df["atr_ratio"] = df["atr_14"] / df["atr_14"].rolling(50).mean()
@@ -238,7 +238,7 @@ class FeatureEngineer:
         df["volume_ratio"] = df["volume"] / df["volume_sma_20"]
 
         # OBV (On Balance Volume)
-        df["obv"] = pta.obv(df["close"], df["volume"])
+        df["obv"] = ta.volume.OnBalanceVolumeIndicator(df["close"], df["volume"]).on_balance_volume()
 
         # CMF (Chaikin Money Flow)
         df["cmf_20"] = pta.cmf(df["high"], df["low"], df["close"], df["volume"], length=20)
