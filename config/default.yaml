@@ -1,0 +1,65 @@
+# Default configuration for XAUUSD Scalping Bot
+
+# Data settings
+data:
+  symbol: "GC=F"
+  period: "5y"
+  interval: "1h"
+  test_size: 0.2
+
+# Feature engineering
+features:
+  lookahead: 5  # bars to predict ahead
+  lookback_window: 100
+
+# Model settings
+model:
+  type: "xgboost"
+  tune_hyperparams: false
+  cv_splits: 5
+
+  # XGBoost parameters
+  xgboost:
+    n_estimators: 200
+    max_depth: 7
+    learning_rate: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    scale_pos_weight: "balanced"
+
+  # LightGBM parameters
+  lightgbm:
+    n_estimators: 200
+    max_depth: 7
+    learning_rate: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+
+  # Random Forest parameters
+  random_forest:
+    n_estimators: 200
+    max_depth: 10
+    min_samples_split: 5
+    min_samples_leaf: 2
+    class_weight: "balanced"
+
+# Signal generation
+signals:
+  buy_threshold: 0.65
+  sell_threshold: 0.35
+  min_confidence: 0.60
+  atr_multiplier_sl: 1.5
+  atr_multiplier_tp: 3.0
+  min_atr: 0.1
+
+# API settings
+api:
+  host: "0.0.0.0"
+  port: 5000
+  debug: false
+
+# Paths
+paths:
+  models_dir: "models"
+  data_dir: "data"
+  logs_dir: "logs"

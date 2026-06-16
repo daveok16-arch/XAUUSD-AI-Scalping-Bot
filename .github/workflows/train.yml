@@ -1,0 +1,81 @@
+name: Train XAUUSD Model
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'Model type'
+        required: true
+        default: 'xgboost'
+        type: choice
+        options:
+          - xgboost
+          - lightgbm
+          - random_forest
+          - gradient_boosting
+      period:
+        description: 'Data period'
+        required: true
+        default: '5y'
+      interval:
+        description: 'Data interval'
+        required: true
+        default: '1h'
+
+  # Schedule: Train weekly on Sundays at 00:00 UTC
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Cache pip packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Train model
+      run: |
+        python -m src.train \
+          --model ${{ github.event.inputs.model || 'xgboost' }} \
+          --period ${{ github.event.inputs.period || '5y' }} \
+          --interval ${{ github.event.inputs.interval || '1h' }} \
+          --output-dir models
+
+    - name: Upload model artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: trained-model-${{ github.run_id }}
+        path: |
+          models/*.joblib
+          models/*.json
+          models/*.csv
+          training.log
+        retention-days: 30
+
+    - name: Commit model to repository
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "GitHub Actions"
+        git add models/
+        git diff --quiet && git diff --staged --quiet || git commit -m "Update trained model [$(date +%Y-%m-%d)]"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

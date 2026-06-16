@@ -1,0 +1,41 @@
+# Core data processing
+pandas==2.2.3
+numpy==1.26.4
+
+# Machine Learning
+scikit-learn==1.6.1
+xgboost==2.1.4
+lightgbm==4.5.0
+
+# Technical Analysis
+ta==0.11.0
+pandas-ta==0.3.14b0
+
+# Data fetching
+yfinance==0.2.54
+requests==2.32.3
+
+# API Framework
+flask==3.1.0
+flask-cors==5.0.0
+waitress==3.0.2
+
+# Environment & Config
+python-dotenv==1.0.1
+
+# Serialization
+joblib==1.4.2
+
+# Monitoring & Logging
+loguru==0.7.3
+
+# Testing
+pytest==8.3.5
+pytest-cov==6.0.0
+
+# Jupyter (for Kaggle)
+ipykernel==6.29.5
+ipython==8.31.0
+
+# Deployment
+gunicorn==23.0.0
