@@ -1,15 +1,18 @@
-# Render.com deployment configuration
 services:
   - type: web
     name: xauusd-scalping-bot
     runtime: python
     plan: free
+
     buildCommand: pip install -r requirements.txt
     startCommand: python -m src.api.app
+
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+
       - key: MODEL_PATH
-        value: /app/models/xauusd_xgboost_model.joblib
+        value: /app/models/xauusd_best_model.joblib
+
     healthCheckPath: /health
     autoDeploy: true
