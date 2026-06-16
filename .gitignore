@@ -73,3 +73,9 @@ models/*.txt
 !src/data/
 !src/data/__init__.py
 !src/data/data_fetcher.py
+
+# Production model artifacts
+!models/xauusd_best_model.joblib
+!models/xauusd_best_model_scaler.joblib
+!models/xauusd_best_model_features.txt
+!models/training_summary.json

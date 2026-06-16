@@ -1,0 +1,19 @@
+{
+  "model_type": "Random Forest",
+  "training_date": "2026-06-16T21:43:03.938679",
+  "data_period": "5y",
+  "interval": "1h",
+  "lookahead": 5,
+  "n_features": 66,
+  "n_samples": 13674,
+  "metrics": {
+    "train_accuracy": 0.8338970655452966,
+    "test_accuracy": 0.493235831809872,
+    "test_precision": 0.54375,
+    "test_recall": 0.062142857142857146,
+    "test_f1": 0.11153846153846154,
+    "test_auc": 0.5201792402354201
+  },
+  "cv_f1_mean": 0.33902817027495474,
+  "cv_f1_std": 0.21048915848846556
+}
