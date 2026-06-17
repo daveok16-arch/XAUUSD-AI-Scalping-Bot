@@ -5,7 +5,7 @@ services:
     plan: free
 
     buildCommand: pip install -r requirements.txt
-    startCommand: python -m src.api.app
+    startCommand: gunicorn -b 0.0.0.0:$PORT src.api.app:app
 
     envVars:
       - key: PYTHON_VERSION

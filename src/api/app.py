@@ -83,6 +83,21 @@ def load_model():
         SIGNAL_GENERATOR = SignalGenerator()
 
         logger.info(f"Model loaded successfully from {model_path}")
+
+from src.signal_worker import init_worker, signal_loop
+import threading
+
+init_worker(
+    MODEL,
+    SCALER,
+    FEATURE_NAMES
+)
+
+threading.Thread(
+    target=signal_loop,
+    daemon=True
+).start()
+
         logger.info(f"Available features: {len(FEATURE_NAMES)}")
 
         return True
