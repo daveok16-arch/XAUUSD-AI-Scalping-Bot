@@ -7,6 +7,7 @@ import joblib
 import yfinance as yf
 
 from src.features.feature_engineering import FeatureEngineer
+from src.signals.telegram_formatter import format_signal
 
 MODEL_PATH = os.getenv("MODEL_PATH", "./models/xauusd_best_model.joblib")
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
