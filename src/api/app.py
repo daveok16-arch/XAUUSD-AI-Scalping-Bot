@@ -7,6 +7,7 @@ Deployable on Render with endpoints for signal generation and model info.
 import json
 import logging
 import os
+from src.signal_worker import init_worker
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -34,6 +35,12 @@ logger = logging.getLogger(__name__)
 
 # Create Flask app
 app = Flask(__name__)
+
+try:
+    init_worker()
+except Exception as e:
+    logger.warning(f"Telegram worker failed: {e}")
+
 CORS(app)
 
 # Global model and components

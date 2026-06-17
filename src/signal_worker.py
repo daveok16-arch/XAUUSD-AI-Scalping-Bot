@@ -1,88 +1,104 @@
-import time
-import logging
 
-from src.telegram_bot import send_telegram_message
-from src.data.data_fetcher import XAUUSDDataFetcher
+import os
+import time
+import threading
+import requests
+import joblib
+import yfinance as yf
+
 from src.features.feature_engineering import FeatureEngineer
 
-logger = logging.getLogger(__name__)
+MODEL_PATH = os.getenv("MODEL_PATH", "./models/xauusd_best_model.joblib")
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-MODEL = None
-SCALER = None
-FEATURES = []
-
-LAST_SIGNAL = None
+model = None
+fe = FeatureEngineer()
 
 
-def init_worker(model, scaler, features):
-    global MODEL, SCALER, FEATURES
+def load_model():
+    global model
+    if os.path.exists(MODEL_PATH):
+        model = joblib.load(MODEL_PATH)
+        print("Telegram worker model loaded")
 
-    MODEL = model
-    SCALER = scaler
-    FEATURES = features
 
-    logger.info("Signal worker ready")
+def send_signal(msg):
+    if not BOT_TOKEN or not CHAT_ID:
+        print("Telegram variables missing")
+        return
+
+    requests.post(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+        json={
+            "chat_id": CHAT_ID,
+            "text": msg
+        },
+        timeout=10
+    )
 
 
 def run_prediction():
 
-    global LAST_SIGNAL
+    if model is None:
+        return
 
-    fetcher = XAUUSDDataFetcher()
+    try:
+        df = yf.download(
+            "GC=F",
+            period="10d",
+            interval="1h",
+            progress=False
+        )
 
-    df = fetcher.fetch_data(
-        period="730d",
-        interval="1h"
-    )
+        df.columns = [
+            c.lower()
+            for c in df.columns
+        ]
 
-    engineer = FeatureEngineer()
+        df = fe.create_all_features(df).dropna()
 
-    df = engineer.create_all_features(df)
+        X = df.tail(1)
 
-    latest = df.iloc[-1:]
+        pred = model.predict(X)[0]
+        prob = model.predict_proba(X)[0][1]
 
-    X = latest[FEATURES]
+        signal = "BUY 🟢" if pred == 1 else "SELL 🔴"
 
-    X_scaled = SCALER.transform(X)
-
-    prediction = MODEL.predict(X_scaled)[0]
-
-    confidence = MODEL.predict_proba(X_scaled)[0][1]
-
-
-    signal = "BUY" if prediction == 1 else "SELL"
-
-
-    if signal != LAST_SIGNAL:
-
-        send_telegram_message(
+        send_signal(
             f"""
-🟡 XAUUSD AI SIGNAL
+XAUUSD AI SIGNAL
 
-Signal: {signal}
+{signal}
 
 Confidence:
-{confidence:.2%}
+{prob:.2%}
 
-Timeframe:
-1H
-
-AI Model:
-XAUUSD Scalping Bot
+Price:
+{float(X['close'].iloc[0])}
 """
         )
 
-        LAST_SIGNAL = signal
+    except Exception as e:
+        print("Prediction error:", e)
 
 
 def signal_loop():
 
     while True:
+        run_prediction()
+        time.sleep(3600)
 
-        try:
-            run_prediction()
 
-        except Exception as e:
-            logger.error(f"Signal error: {e}")
+def init_worker():
 
-        time.sleep(300)
+    load_model()
+
+    t = threading.Thread(
+        target=signal_loop,
+        daemon=True
+    )
+
+    t.start()
+
+    print("Telegram signal worker started")
