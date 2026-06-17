@@ -8,6 +8,12 @@ import yfinance as yf
 from src.features.feature_engineering import FeatureEngineer
 
 MODEL_PATH = os.getenv("MODEL_PATH", "./models/xauusd_best_model.joblib")
+
+if not os.path.exists(MODEL_PATH):
+    fallback = "./models/xauusd_best_model.joblib"
+    if os.path.exists(fallback):
+        MODEL_PATH = fallback
+
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
