@@ -38,3 +38,6 @@ ipython==8.31.0
 
 # Deployment
 gunicorn==23.0.0
+
+# TwelveData
+requests==2.32.3

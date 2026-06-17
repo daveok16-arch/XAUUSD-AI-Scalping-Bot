@@ -3,7 +3,7 @@ import time
 import threading
 import requests
 import joblib
-import yfinance as yf
+from src.data.twelvedata_fetcher import get_xauusd_data
 
 from src.features.feature_engineering import FeatureEngineer
 
@@ -66,12 +66,7 @@ def run_prediction():
         return
 
     try:
-        df = yf.download(
-            "GC=F",
-            period="10d",
-            interval="1h",
-            progress=False,
-        )
+        df = get_xauusd_data(interval="5min", outputsize=500)
 
         df.columns = [str(c).lower() for c in df.columns]
 
